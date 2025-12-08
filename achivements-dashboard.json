@@ -1,0 +1,967 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 59,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PC98BA2F4D77E1A42"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "dark-red",
+                  "index": 0,
+                  "text": "❌"
+                },
+                "1": {
+                  "color": "dark-green",
+                  "index": 1,
+                  "text": "🏆"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "PC98BA2F4D77E1A42"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "-- 1. HYPERMILER\nSELECT '🏅 Hypermiler' AS \"Achievement\", 'Drive >50km with >100% efficiency vs rated range' AS \"Mission\",\nCASE WHEN EXISTS (\n    SELECT 1 FROM drives WHERE car_id = 1 AND distance > 50 \n    AND (start_rated_range_km - end_rated_range_km) > 0\n    AND distance > (start_rated_range_km - end_rated_range_km)\n) THEN 1 ELSE 0 END AS \"Status\"\n\nUNION ALL\n\n-- 2. SUPERCHARGER JUNKIE\nSELECT '⚡ Supercharger Junkie', 'Fast charge at speeds over 120 kW',\nCASE WHEN EXISTS (\n    SELECT 1 FROM charges c JOIN charging_processes cp ON cp.id = c.charging_process_id\n    WHERE cp.car_id = 1 AND c.charger_power > 120\n) THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 3. LIVING ON THE EDGE\nSELECT '⚠️ Living on the Edge', 'Finish a drive with less than 5% battery',\nCASE WHEN EXISTS (\n    SELECT 1 FROM drives d JOIN positions p ON p.id = d.end_position_id\n    WHERE d.car_id = 1 AND p.battery_level < 5\n) THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 4. EFFICIENCY MASTER\nSELECT '🍃 Efficiency Master', 'Efficiency >100% vs Rated (7-day streak)',\nCASE WHEN EXISTS (\n    SELECT 1 FROM (\n        SELECT avg(distance / NULLIF(start_rated_range_km - end_rated_range_km, 0)) OVER (ORDER BY start_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) as eff\n        FROM drives WHERE car_id=1 AND distance > 10\n    ) sub WHERE eff >= 1.0\n) THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 5. EFFICIENCY EXPERT\nSELECT '🌿 Efficiency Expert', 'Efficiency >110% vs Rated (7-day streak)',\nCASE WHEN EXISTS (\n    SELECT 1 FROM (\n        SELECT avg(distance / NULLIF(start_rated_range_km - end_rated_range_km, 0)) OVER (ORDER BY start_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) as eff\n        FROM drives WHERE car_id=1 AND distance > 10\n    ) sub WHERE eff >= 1.1\n) THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 6. EFFICIENCY GURU\nSELECT '🧘 Efficiency Guru', 'Efficiency >120% vs Rated (7-day streak)',\nCASE WHEN EXISTS (\n    SELECT 1 FROM (\n        SELECT avg(distance / NULLIF(start_rated_range_km - end_rated_range_km, 0)) OVER (ORDER BY start_date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) as eff\n        FROM drives WHERE car_id=1 AND distance > 10\n    ) sub WHERE eff >= 1.2\n) THEN 1 ELSE 0 END;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "🌿 Efficiency & Energy",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PC98BA2F4D77E1A42"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "dark-red",
+                  "index": 0,
+                  "text": "❌"
+                },
+                "1": {
+                  "color": "dark-green",
+                  "index": 1,
+                  "text": "🏆"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      },
+      "id": 2,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "PC98BA2F4D77E1A42"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "-- 1. LOCAL EXPLORER\nSELECT '🏙️ Local Explorer' AS \"Achievement\", 'Visit 5 different cities' AS \"Mission\",\nCASE WHEN (\n    SELECT count(distinct city) FROM addresses a JOIN drives d ON d.end_address_id = a.id WHERE d.car_id=1\n) >= 5 THEN 1 ELSE 0 END AS \"Status\"\n\nUNION ALL\n\n-- 2. REGIONAL EXPLORER\nSELECT '🗺️ Regional Explorer', 'Visit 10 different regions/counties',\nCASE WHEN (\n    SELECT count(distinct county) FROM addresses a JOIN drives d ON d.end_address_id = a.id WHERE d.car_id=1\n) >= 10 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 3. NATIONAL EXPLORER\nSELECT '🇪🇸 National Explorer', 'Visit 15 different States/Provinces',\nCASE WHEN (\n    SELECT count(distinct state) FROM addresses a JOIN drives d ON d.end_address_id = a.id WHERE d.car_id=1\n) >= 15 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 4. ADVENTURER\nSELECT '🎒 Adventurer', 'Travel more than 300 km from home',\nCASE WHEN EXISTS (\n    SELECT 1 FROM positions p, geofences g\n    WHERE p.car_id=1 AND (g.name ILIKE '%Home%' OR g.name ILIKE '%Casa%')\n    AND (6371 * acos(cos(radians(g.latitude)) * cos(radians(p.latitude)) * cos(radians(p.longitude) - radians(g.longitude)) + sin(radians(g.latitude)) * sin(radians(p.latitude)))) > 300\n) THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 5. GLOBETROTTER\nSELECT '🌍 Globetrotter', 'Travel more than 500 km from home',\nCASE WHEN EXISTS (\n    SELECT 1 FROM positions p, geofences g\n    WHERE p.car_id=1 AND (g.name ILIKE '%Home%' OR g.name ILIKE '%Casa%')\n    AND (6371 * acos(cos(radians(g.latitude)) * cos(radians(p.latitude)) * cos(radians(p.longitude) - radians(g.longitude)) + sin(radians(g.latitude)) * sin(radians(p.latitude)))) > 500\n) THEN 1 ELSE 0 END;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "🌍 Exploration & Geography",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PC98BA2F4D77E1A42"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "dark-red",
+                  "index": 0,
+                  "text": "❌"
+                },
+                "1": {
+                  "color": "dark-green",
+                  "index": 1,
+                  "text": "🏆"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 3,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "PC98BA2F4D77E1A42"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "-- 1. SUB-ZERO\nSELECT '❄️ Sub-Zero' AS \"Achievement\", 'Charge while outside temp is below 0°C' AS \"Mission\",\nCASE WHEN EXISTS (\n    SELECT 1 FROM charging_processes cp JOIN positions p ON p.id = cp.position_id\n    WHERE cp.car_id = 1 AND p.outside_temp < 0\n) THEN 1 ELSE 0 END AS \"Status\"\n\nUNION ALL\n\n-- 2. NIGHT RIDER\nSELECT '🦇 Night Rider', 'Complete a drive between 02:00 AM and 05:00 AM',\nCASE WHEN EXISTS (\n    SELECT 1 FROM drives WHERE car_id = 1 AND EXTRACT(HOUR FROM start_date) BETWEEN 2 AND 4\n) THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 3. NIGHT OWL\nSELECT '🌙 Night Owl', 'Accumulate >100 km at night (00:00-06:00)',\nCASE WHEN (\n    SELECT sum(distance) FROM drives WHERE car_id=1 AND EXTRACT(HOUR FROM start_date) BETWEEN 0 AND 5\n) > 100 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 4. MIDNIGHT WARRIOR\nSELECT '🦉 Midnight Warrior', 'Accumulate >500 km at night (00:00-06:00)',\nCASE WHEN (\n    SELECT sum(distance) FROM drives WHERE car_id=1 AND EXTRACT(HOUR FROM start_date) BETWEEN 0 AND 5\n) > 500 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 5. EARLY BIRD\nSELECT '🌅 Early Bird', 'Start 10 charging sessions before 7:00 AM',\nCASE WHEN (\n    SELECT count(*) FROM charging_processes WHERE car_id=1 AND EXTRACT(HOUR FROM start_date) < 7\n) >= 10 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 6. RISE AND SHINE\nSELECT '🐓 Rise and Shine', 'Start 50 charging sessions before 7:00 AM',\nCASE WHEN (\n    SELECT count(*) FROM charging_processes WHERE car_id=1 AND EXTRACT(HOUR FROM start_date) < 7\n) >= 50 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 7. VETERAN\nSELECT '📅 Veteran', 'Data collected for more than 1 year',\nCASE WHEN (NOW() - (SELECT min(start_date) FROM drives WHERE car_id = 1)) > INTERVAL '1 year'\nTHEN 1 ELSE 0 END;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "⏱️ Time & Weather",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PC98BA2F4D77E1A42"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "dark-red",
+                  "index": 0,
+                  "text": "❌"
+                },
+                "1": {
+                  "color": "dark-green",
+                  "index": 1,
+                  "text": "🏆"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 26
+      },
+      "id": 4,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "PC98BA2F4D77E1A42"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "-- 1. IRON BUTT (Distance is safe to use from drives)\nSELECT '🍑 Iron Butt' AS \"Achievement\", 'Drive >400km in a single trip' AS \"Mission\",\nCASE WHEN (SELECT max(distance) FROM drives WHERE car_id = 1) > 400 THEN 1 ELSE 0 END AS \"Status\"\n\nUNION ALL\n\n-- 2. TOTAL MARATHONER\nSELECT '🏃 Total Marathoner', 'Accumulate >10,000 km total distance',\nCASE WHEN (SELECT sum(distance) FROM drives WHERE car_id = 1) > 10000 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 3. DAILY MARATHONER\nSELECT '👟 Daily Marathoner', 'Drive >500 km in a single day',\nCASE WHEN EXISTS (\n    SELECT 1 FROM drives WHERE car_id=1 GROUP BY start_date::date HAVING sum(distance) > 500\n) THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 4. ULTRA MARATHONER\nSELECT '🦾 Ultra Marathoner', 'Drive >800 km in a single day',\nCASE WHEN EXISTS (\n    SELECT 1 FROM drives WHERE car_id=1 GROUP BY start_date::date HAVING sum(distance) > 800\n) THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 5. SPEEDSTER (Direct lookup in positions table - correct)\nSELECT '🚀 Speedster', 'Reach a top speed >180 km/h',\nCASE WHEN EXISTS (\n    SELECT 1 FROM positions WHERE car_id=1 AND speed > 180\n) THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 6. SMOOTH OPERATOR (FIXED: Looking at positions instead of drives)\nSELECT '🧘 Smooth Operator', '1,000 km streak without exceeding 120 km/h',\nCASE WHEN (\n    WITH LastSpeedingEvent AS (\n        -- Buscamos la última vez exacta que el coche pasó de 120 km/h en la tabla de posiciones\n        SELECT max(date) as last_speeding_time\n        FROM positions\n        WHERE car_id = 1 AND speed > 120\n    )\n    -- Sumamos la distancia de todos los viajes que empezaron DESPUÉS de ese momento\n    SELECT sum(distance)\n    FROM drives\n    WHERE car_id = 1\n    AND start_date > COALESCE((SELECT last_speeding_time FROM LastSpeedingEvent), '2000-01-01')\n) > 1000 THEN 1 ELSE 0 END;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "🏎️ Endurance & Performance",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PC98BA2F4D77E1A42"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "dark-red",
+                  "index": 0,
+                  "text": "❌"
+                },
+                "1": {
+                  "color": "dark-green",
+                  "index": 1,
+                  "text": "🏆"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 35
+      },
+      "id": 5,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "PC98BA2F4D77E1A42"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "-- 1. FIRST SPARK (Desbloqueado)\nSELECT '🔓 First Spark' AS \"Achievement\", 'First time data recorded' AS \"Mission\",\nCASE WHEN (SELECT count(*) FROM drives WHERE car_id = 1) > 0 THEN 1 ELSE 0 END AS \"Status\"\n\nUNION ALL\n\n-- 2. BOUNTY HUNTER (Cazador de Gratis - 100 kWh)\nSELECT '🆓 Bounty Hunter', 'Charge 100 kWh for free (0 cost recorded)',\nCASE WHEN (\n    SELECT sum(charge_energy_added) FROM charging_processes \n    WHERE car_id = 1 AND (cost = 0 OR cost IS NULL)\n) >= 100 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 3. FREELOADER (Aprovechado - 1000 kWh)\nSELECT '🏴‍☠️ Freeloader', 'Charge 1,000 kWh for free',\nCASE WHEN (\n    SELECT sum(charge_energy_added) FROM charging_processes \n    WHERE car_id = 1 AND (cost = 0 OR cost IS NULL)\n) >= 1000 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 4. NIGHT PLANNER (Planificador Nocturno)\nSELECT '🌙 Night Planner', 'Complete 50 charging sessions off-peak (00:00-08:00)',\nCASE WHEN (\n    SELECT count(*) FROM charging_processes \n    WHERE car_id = 1 AND EXTRACT(HOUR FROM start_date) BETWEEN 0 AND 8\n) >= 50 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 5. THRIFTY (Ahorrativo - Estimado)\n-- Fórmula: Km Totales * 0.10€ de ahorro medio - Coste real de cargas\nSELECT '🐖 Thrifty', 'Save estimated >500€ vs Gas',\nCASE WHEN (\n    SELECT (sum(distance)*0.10) - (SELECT sum(coalesce(cost,0)) FROM charging_processes WHERE car_id=1)\n    FROM drives WHERE car_id = 1\n) > 500 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 6. GREEN TYCOON (Millonario Verde - Estimado)\nSELECT '🤑 Green Tycoon', 'Save estimated >1,000€ vs Gas',\nCASE WHEN (\n    SELECT (sum(distance)*0.10) - (SELECT sum(coalesce(cost,0)) FROM charging_processes WHERE car_id=1)\n    FROM drives WHERE car_id = 1\n) > 1000 THEN 1 ELSE 0 END;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "💰 Savings & Charging Habits",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PC98BA2F4D77E1A42"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "dark-red",
+                  "index": 0,
+                  "text": "❌"
+                },
+                "1": {
+                  "color": "dark-green",
+                  "index": 1,
+                  "text": "🏆"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 44
+      },
+      "id": 6,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "PC98BA2F4D77E1A42"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "-- 1. PATIENT LVL 1\nSELECT '🧘 Patient Lvl 1' AS \"Achievement\", 'Spent 10 hours charging total' AS \"Mission\",\nCASE WHEN (\n    SELECT sum(duration_min) FROM charging_processes WHERE car_id = 1\n) >= 600 THEN 1 ELSE 0 END AS \"Status\"\n\nUNION ALL\n\n-- 2. PATIENT LVL 2\nSELECT '🧘 Patient Lvl 2', 'Spent 50 hours charging total',\nCASE WHEN (\n    SELECT sum(duration_min) FROM charging_processes WHERE car_id = 1\n) >= 3000 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 3. PATIENT LVL 3\nSELECT '🧘 Patient Lvl 3', 'Spent 100 hours charging total',\nCASE WHEN (\n    SELECT sum(duration_min) FROM charging_processes WHERE car_id = 1\n) >= 6000 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 4. AC DEVOTEE (Calculated: Avg Power < 22kW)\n-- Fix: We calculate (kWh / Hours). If avg power is < 22kW, it's likely AC.\nSELECT '🔌 AC Devotee', '80% of charging sessions are AC (Slow)',\nCASE WHEN (\n    SELECT \n        count(*) FILTER (WHERE (charge_energy_added / NULLIF(duration_min/60.0, 0)) < 22)::float \n        / NULLIF(count(*)::float, 0)\n    FROM charging_processes WHERE car_id = 1 AND duration_min > 0\n) >= 0.8 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 5. FAST CHARGE PRO (Calculated: Avg Power > 50kW)\n-- Fix: We calculate (kWh / Hours). If avg power > 50kW, it's definitely DC/Supercharger.\nSELECT '⚡ Fast Charge Pro', 'Complete 100 Supercharger sessions (>50kW)',\nCASE WHEN (\n    SELECT count(*) \n    FROM charging_processes \n    WHERE car_id = 1 \n    AND duration_min > 0\n    AND (charge_energy_added / NULLIF(duration_min/60.0, 0)) > 50\n) >= 100 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 6. FULL CYCLE\nSELECT '🔋 Full Cycle', 'Charge from <10% to >95%',\nCASE WHEN EXISTS (\n    SELECT 1 FROM charging_processes \n    WHERE car_id = 1 \n    AND start_battery_level < 10 \n    AND end_battery_level > 95\n) THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 7. THE OPTIMIZER\nSELECT '📐 The Optimizer', 'Finish 100 charges between 80-90% SoC',\nCASE WHEN (\n    SELECT count(*) FROM charging_processes \n    WHERE car_id = 1 AND end_battery_level BETWEEN 80 AND 90\n) >= 100 THEN 1 ELSE 0 END\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "🔋 Battery Tech & Strategy",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PC98BA2F4D77E1A42"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "dark-red",
+                  "index": 0,
+                  "text": "❌"
+                },
+                "1": {
+                  "color": "dark-green",
+                  "index": 1,
+                  "text": "🏆"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 53
+      },
+      "id": 7,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "PC98BA2F4D77E1A42"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "-- 1. PLANET GUARDIAN (1000 kg CO2)\nSELECT '🛡️ Planet Guardian' AS \"Achievement\", 'Save 1,000 kg of CO2 vs ICE car' AS \"Mission\",\nCASE WHEN (\n    SELECT sum(distance) * 0.12 FROM drives WHERE car_id = 1\n) >= 1000 THEN 1 ELSE 0 END AS \"Status\"\n\nUNION ALL\n\n-- 2. CLIMATE HERO (5000 kg CO2)\nSELECT '🦸 Climate Hero', 'Save 5,000 kg of CO2 vs ICE car',\nCASE WHEN (\n    SELECT sum(distance) * 0.12 FROM drives WHERE car_id = 1\n) >= 5000 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 3. PERSONAL FOREST (50 Trees)\n-- Logic: 50 trees * 22kg CO2/tree = 1,100 kg CO2 saved\nSELECT '🌳 Personal Forest', 'Save CO2 equivalent to planting 50 trees',\nCASE WHEN (\n    SELECT sum(distance) * 0.12 FROM drives WHERE car_id = 1\n) >= (50 * 22) THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 4. AMAZON RAINFOREST (200 Trees)\n-- Logic: 200 trees * 22kg CO2/tree = 4,400 kg CO2 saved\nSELECT '🦜 Amazon Rainforest', 'Save CO2 equivalent to planting 200 trees',\nCASE WHEN (\n    SELECT sum(distance) * 0.12 FROM drives WHERE car_id = 1\n) >= (200 * 22) THEN 1 ELSE 0 END;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "🌿 Ecology & Impact",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PC98BA2F4D77E1A42"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "dark-red",
+                  "index": 0,
+                  "text": "❌"
+                },
+                "1": {
+                  "color": "dark-green",
+                  "index": 1,
+                  "text": "🏆"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 60
+      },
+      "id": 8,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "PC98BA2F4D77E1A42"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "-- 1. AROUND THE WORLD (Circunferencia Tierra)\nSELECT '🌍 Around the World' AS \"Achievement\", 'Drive 40,075 km (Earth Circumference)' AS \"Mission\",\nCASE WHEN (\n    SELECT sum(distance) FROM drives WHERE car_id = 1\n) >= 40075 THEN 1 ELSE 0 END AS \"Status\"\n\nUNION ALL\n\n-- 2. ISS ORBITER (Orbita ISS)\n-- Distancia de una órbita completa de la ISS (~42,500 km)\nSELECT '🛰️ ISS Orbiter', 'Drive 42,500 km (One ISS Orbit distance)',\nCASE WHEN (\n    SELECT sum(distance) FROM drives WHERE car_id = 1\n) >= 42500 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 3. TO THE MOON (Distancia Luna)\nSELECT '🚀 To the Moon', 'Drive 384,400 km (Earth to Moon distance)',\nCASE WHEN (\n    SELECT sum(distance) FROM drives WHERE car_id = 1\n) >= 384400 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 4. 24H LE MANS (Días de Vida - 24h)\nSELECT '🏎️ 24h Le Mans', 'Spend 24 total hours driving',\nCASE WHEN (\n    SELECT sum(duration_min) FROM drives WHERE car_id = 1\n) >= (24 * 60) THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 5. ROAD TOURIST (Turista - 100h)\nSELECT '📸 Road Tourist', 'Spend 100 total hours driving',\nCASE WHEN (\n    SELECT sum(duration_min) FROM drives WHERE car_id = 1\n) >= (100 * 60) THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 6. A WEEK ON THE ROAD (Semana de Vida - 168h)\nSELECT '📅 A Week on the Road', 'Spend 168 total hours (1 week) driving',\nCASE WHEN (\n    SELECT sum(duration_min) FROM drives WHERE car_id = 1\n) >= (168 * 60) THEN 1 ELSE 0 END;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "🚀 Space & Time Continuum",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "PC98BA2F4D77E1A42"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "dark-red",
+                  "index": 0,
+                  "text": "❌"
+                },
+                "1": {
+                  "color": "dark-green",
+                  "index": 1,
+                  "text": "🏆"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 69
+      },
+      "id": 9,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "PC98BA2F4D77E1A42"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "-- 1. ACTIVE STREAK 7 (Calculated using Gaps-and-Islands method)\nSELECT '🔥 Daily Driver (7 Days)' AS \"Achievement\", 'Drive 7 consecutive days' AS \"Mission\",\nCASE WHEN (\n    WITH Dates AS (SELECT DISTINCT start_date::date as d FROM drives WHERE car_id=1),\n    Groups AS (SELECT d, d - (ROW_NUMBER() OVER (ORDER BY d) * interval '1 day') as grp FROM Dates),\n    Streaks AS (SELECT count(*) as days FROM Groups GROUP BY grp)\n    SELECT max(days) FROM Streaks\n) >= 7 THEN 1 ELSE 0 END AS \"Status\"\n\nUNION ALL\n\n-- 2. ACTIVE STREAK 30\nSELECT '🔥 Daily Driver (30 Days)', 'Drive 30 consecutive days',\nCASE WHEN (\n    WITH Dates AS (SELECT DISTINCT start_date::date as d FROM drives WHERE car_id=1),\n    Groups AS (SELECT d, d - (ROW_NUMBER() OVER (ORDER BY d) * interval '1 day') as grp FROM Dates),\n    Streaks AS (SELECT count(*) as days FROM Groups GROUP BY grp)\n    SELECT max(days) FROM Streaks\n) >= 30 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 3. ACTIVE STREAK 100\nSELECT '🔥 Daily Driver (100 Days)', 'Drive 100 consecutive days',\nCASE WHEN (\n    WITH Dates AS (SELECT DISTINCT start_date::date as d FROM drives WHERE car_id=1),\n    Groups AS (SELECT d, d - (ROW_NUMBER() OVER (ORDER BY d) * interval '1 day') as grp FROM Dates),\n    Streaks AS (SELECT count(*) as days FROM Groups GROUP BY grp)\n    SELECT max(days) FROM Streaks\n) >= 100 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 4. WEEKENDER (>60% Weekend)\n-- Logic: (Weekend Distance / Total Distance) > 0.6\nSELECT '🏖️ Weekender', '60% of driving done on weekends',\nCASE WHEN (\n    SELECT sum(distance) FILTER (WHERE EXTRACT(ISODOW FROM start_date) IN (6,7)) \n           / NULLIF(sum(distance), 0)\n    FROM drives WHERE car_id=1\n) > 0.6 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 5. WORKAHOLIC (>60% Weekdays)\n-- Logic: (Weekday Distance / Total Distance) > 0.6\nSELECT '💼 Workaholic', '60% of driving done on weekdays (Mon-Fri)',\nCASE WHEN (\n    SELECT sum(distance) FILTER (WHERE EXTRACT(ISODOW FROM start_date) NOT IN (6,7)) \n           / NULLIF(sum(distance), 0)\n    FROM drives WHERE car_id=1\n) > 0.6 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 6. INFERNO RIDER (>40°C)\nSELECT '🔥 Inferno Rider', 'Drive in temperatures > 40°C',\nCASE WHEN EXISTS (\n    SELECT 1 FROM positions WHERE car_id=1 AND outside_temp > 40\n) THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 7. ICE ROAD TRUCKER (<-10°C)\nSELECT '❄️ Ice Road Trucker', 'Drive in temperatures < -10°C',\nCASE WHEN EXISTS (\n    SELECT 1 FROM positions WHERE car_id=1 AND outside_temp < -10\n) THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 8. MOUNTAINEER (10k meters elevation gain)\n-- Logic: Sum of (End Elevation - Start Elevation) for all trips that went UP.\nSELECT '⛰️ Mountaineer', 'Climb 10,000m cumulative elevation',\nCASE WHEN (\n    SELECT sum(p_end.elevation - p_start.elevation)\n    FROM drives d\n    JOIN positions p_start ON d.start_position_id = p_start.id\n    JOIN positions p_end ON d.end_position_id = p_end.id\n    WHERE d.car_id = 1 AND p_end.elevation > p_start.elevation\n) >= 10000 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 9. ALPINIST (50k meters)\nSELECT '🧗 Alpinist', 'Climb 50,000m cumulative elevation',\nCASE WHEN (\n    SELECT sum(p_end.elevation - p_start.elevation)\n    FROM drives d\n    JOIN positions p_start ON d.start_position_id = p_start.id\n    JOIN positions p_end ON d.end_position_id = p_end.id\n    WHERE d.car_id = 1 AND p_end.elevation > p_start.elevation\n) >= 50000 THEN 1 ELSE 0 END\n\nUNION ALL\n\n-- 10. THE SHERPA (100k meters)\nSELECT '🏔️ The Sherpa', 'Climb 100,000m cumulative elevation',\nCASE WHEN (\n    SELECT sum(p_end.elevation - p_start.elevation)\n    FROM drives d\n    JOIN positions p_start ON d.start_position_id = p_start.id\n    JOIN positions p_end ON d.end_position_id = p_end.id\n    WHERE d.car_id = 1 AND p_end.elevation > p_start.elevation\n) >= 100000 THEN 1 ELSE 0 END;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "🏔️ Habits & Extremes",
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-1y",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Achievements",
+  "uid": "c6020bdb-a2c7-4b1c-ab2c-fd34ab836c6e",
+  "version": 11
+}
