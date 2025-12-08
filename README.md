@@ -14,6 +14,9 @@
 *A comprehensive gamification dashboard for TeslaMate that tracks and displays various driving achievements based on your Tesla vehicle data.*
 
 [Quick Start](#-quick-start) • [Configuration](#️-configuration) • [Achievements](#-achievement-categories) • [Troubleshooting](#-troubleshooting)
+
+
+  <img src="https://cdn.crstian.me/achievements-dashboard.png" alt="Achievements Dashboard" width="800"/>
 </div>
 
 ---
