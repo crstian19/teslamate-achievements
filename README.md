@@ -288,6 +288,8 @@ Other way to support me is to use my referral link to purchase a Tesla product a
 
 **[Use my Tesla referral link](https://ts.la/cristian354389)**
 
+You can see my Tesla gear here: **[teslagear.crstian.me](https://teslagear.crstian.me/)**
+
 Your support helps keep this project maintained and improved! 🙏
 
 
