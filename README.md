@@ -11,7 +11,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org/)
 [![TeslaMate](https://img.shields.io/badge/TeslaMate-Compatible-green?style=for-the-badge)](https://github.com/teslamate-org/teslamate)
 
-*A comprehensive gamification dashboard for TeslaMate that tracks and displays various driving achievements based on your Tesla vehicle data.*
+*A gamification dashboard for TeslaMate that tracks and displays various driving achievements based on your Tesla vehicle data.*
 
 [Quick Start](#-quick-start) • [Configuration](#️-configuration) • [Achievements](#-achievement-categories) • [Troubleshooting](#-troubleshooting)
 
@@ -34,14 +34,6 @@ This dashboard transforms your Tesla driving experience into an engaging achieve
 - **Customizable Metrics** to match your driving habits and preferences
 - **Environment-focused Tracking** with CO₂ savings calculations
 
-### 🎯 Perfect for
-
-- **Tesla Enthusiasts** who want to gamify their driving experience
-- **Data-driven Drivers** who love tracking metrics and progress
-- **Eco-conscious Owners** monitoring their environmental impact
-- **Long-distance Travelers** documenting their journeys
-- **Daily Commuters** optimizing their efficiency and habits
-
 ---
 
 ## 🚀 Quick Start
@@ -52,40 +44,37 @@ Before you begin, ensure you have:
 
 - ✅ **TeslaMate**: Fully functional instance with PostgreSQL database
 - ✅ **Grafana**: Version 12.1.1 or higher with table panel support
-- ✅ **PostgreSQL**: Direct access to your TeslaMate database
-- ✅ **Basic SQL Knowledge**: For customization and troubleshooting
 
 ### Installation
 
-1. **Download the Dashboard**
+**Edit your Teslamate "docker-compose.yml" file and add these two new lines at the end of the "volumes" section of the grafana container:**
+
+```yaml
+services:
+  grafana:
+    volumes:
+      - teslamate-grafana-data:/var/lib/grafana
+      - ~/teslamate-achievements/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
+      - ~/teslamate-achievements/dashboards:/TeslaMateAchievements
+```
+
+1. **Clone this repository** (if you haven't already):
    ```bash
-   # Clone this repository
-   git clone https://github.com/your-username/teslamate-achievements.git
-   cd teslamate-achievements
-
-   # Or download the JSON directly
-   wget https://raw.githubusercontent.com/your-username/teslamate-achievements/main/achivements-dashboard.json
+   git clone https://github.com/your-username/teslamate-achievements.git ~/teslamate-achievements
    ```
 
-2. **Import to Grafana**
-   - Open your Grafana instance
-   - Navigate to **Dashboards** → **Import**
-   - Upload the `achivements-dashboard.json` file
-   - Configure the PostgreSQL datasource connection
-   - Verify the datasource UID (default: `PC98BA2F4D77E1A42`)
+2. **Save your docker-compose.yml file**
 
-3. **Configure Car Settings**
-   ```sql
-   -- Edit the dashboard queries to match your car ID
-   WHERE car_id = 1  -- Replace with your actual car ID
+3. **Recreate Grafana container**:
+   ```bash
+   docker compose up -d
    ```
 
-4. **Verify Installation**
-   - Check that achievements display correctly
-   - Validate data connections
-   - Test dashboard functionality
+4. **Browse the Grafana Dashboards** from the Web and you should have a new "TeslaMate Achievements" folder
 
 ---
+
+
 
 ## ⚙️ Configuration
 
@@ -208,23 +197,7 @@ Customize your savings calculations:
 
 ---
 
-## 📊 Dashboard Features
 
-### Visual Design
-
-- **Status Indicators**: 🏆 for completed, ❌ for locked achievements
-- **Color Coding**: Green for achievements, red for incomplete
-- **Category Organization**: Logical grouping of related achievements
-- **Progress Tracking**: Real-time updates as you drive
-
-### Data Processing
-
-- **Real-time Calculations**: Achievement status updates immediately
-- **SQL Optimization**: Efficient queries for fast dashboard loading
-- **Historical Analysis**: Uses all available TeslaMate data
-- **Cross-referenced Data**: Combines drives, charges, positions, and geofences
-
----
 
 ## 🐛 Troubleshooting
 
@@ -275,18 +248,7 @@ We welcome contributions! Here's how you can help:
 ### 🎯 Contribution Areas
 
 - **New Achievement Ideas**: Suggest creative and motivating achievements
-- **SQL Optimization**: Improve query performance and accuracy
-- **Documentation**: Enhance README and add examples
 - **Bug Reports**: Report issues with detailed descriptions
-- **Feature Requests**: Propose new functionality
-
-### 📝 Development Guidelines
-
-1. **Fork** the repository
-2. **Create** a feature branch: `git checkout -b feature/amazing-achievement`
-3. **Make** your changes with proper documentation
-4. **Test** thoroughly with different datasets
-5. **Submit** a pull request with clear description
 
 ---
 
@@ -309,27 +271,25 @@ Special thanks to the TeslaMate community for creating such a comprehensive data
 
 ---
 
-## 📞 Support
 
-### Getting Help
+## 💝 Donate & Support
 
-If you encounter issues or have questions:
+If you find this project useful and want to support its development:
 
-1. **Check Troubleshooting**: Review the [troubleshooting section](#-troubleshooting) above
-2. **Search Issues**: Check existing [GitHub issues](https://github.com/your-username/teslamate-achievements/issues)
-3. **Verify TeslaMate**: Ensure your TeslaMate setup is working correctly
-4. **Community Support**: Ask in TeslaMate community forums
+### PayPal Donation
+[![Donate with PayPal](https://raw.githubusercontent.com/stefan-niedermann/paypal-donate-button/master/paypal-donate-button.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MUW2XFMQB2782)
 
-### Issue Reporting
+### Tesla Referral
+Other way to support me is to use my referral link to purchase a Tesla product and get Credits you can redeem for exclusive awards like Supercharging miles, merchandise, and accessories.
 
-When reporting issues, please include:
+<div align="center">
+  <img src="https://images.seeklogo.com/logo-png/36/1/tesla-motors-logo-png_seeklogo-365011.png" alt="Tesla Logo" width="100"/>
+</div>
 
-- ✅ **Grafana Version**: Your Grafana instance version
-- ✅ **TeslaMate Version**: Your TeslaMate setup details
-- ✅ **Database Schema**: PostgreSQL version and any customizations
-- ✅ **Error Messages**: Complete error messages and logs
-- ✅ **Steps to Reproduce**: Detailed reproduction steps
-- ✅ **Expected vs Actual**: What you expected vs what happened
+**[Use my Tesla referral link](https://ts.la/cristian354389)**
+
+Your support helps keep this project maintained and improved! 🙏
+
 
 ---
 
