@@ -277,7 +277,7 @@ Special thanks to the TeslaMate community for creating such a comprehensive data
 If you find this project useful and want to support its development:
 
 ### PayPal Donation
-[![Donate with PayPal](https://raw.githubusercontent.com/stefan-niedermann/paypal-donate-button/master/paypal-donate-button.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MUW2XFMQB2782)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-blue?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=MUW2XFMQB2782)
 
 ### Tesla Referral
 Other way to support me is to use my referral link to purchase a Tesla product and get Credits you can redeem for exclusive awards like Supercharging miles, merchandise, and accessories.
