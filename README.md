@@ -283,7 +283,7 @@ If you find this project useful and want to support its development:
 Other way to support me is to use my referral link to purchase a Tesla product and get Credits you can redeem for exclusive awards like Supercharging miles, merchandise, and accessories.
 
 <div align="center">
-  <img src="https://images.seeklogo.com/logo-png/36/1/tesla-motors-logo-png_seeklogo-365011.png" alt="Tesla Logo" width="100"/>
+  <img src="https://cdn.crstian.me/tesla-wide.png" alt="Tesla Logo" width="100"/>
 </div>
 
 **[Use my Tesla referral link](https://ts.la/cristian354389)**
